@@ -1,0 +1,2 @@
+spadesout/scaffolds.fasta	neighbors/shigellaflexneri.fasta	98.9094	1449	1707
+spadesout/scaffolds.fasta	neighbors/shigellasonnei.fasta		97.9733	1388	1707

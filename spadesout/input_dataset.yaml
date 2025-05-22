@@ -1,0 +1,7 @@
+- "left reads":
+  - "/Users/fionashavilof/Desktop/FinalProject/SRR33420661_1.fastq"
+  "number": !!int "1"
+  "orientation": "fr"
+  "right reads":
+  - "/Users/fionashavilof/Desktop/FinalProject/SRR33420661_2.fastq"
+  "type": "paired-end"
