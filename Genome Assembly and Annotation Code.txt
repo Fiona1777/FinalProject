@@ -1,0 +1,96 @@
+#If not done so, download these software using this code:
+
+	conda create -n genomeanalysis -c bioconda -c conda-forge abyss quast dfast fastani spades=4.1.0
+
+#Activate the environment using this code to able to use those software:
+
+	conda activate genomeanalysis
+
+#This code allows you to download plasmids for DFAST. You only need to do this once.
+
+	download-db.sh
+
+#This code allows you to download the database files for DFAST. This needs to be done once as well.
+
+	mkdir -p ~/miniconda3/envs/genomeanalysis/opt/dfast-1.3.6/
+cd ~/miniconda3/envs/genomeanalysis/opt/dfast-1.3.6/
+wget https://dfast.annotation.jp/dfast_core_db.tar.gz
+tar -xvzf dfast_core_db.tar.gz
+
+
+#Navigate to your folder that contains the reads. 
+
+	cd "Final Project"
+
+# We are going to first assemble our genome using Spades.
+
+	spades.py -1 SRR33420661_1.fastq -2 SRR33420661_2.fastq -o spadesout
+
+# Next we will also assemble our genome using abyss. 
+
+	abyss-pe name=assembly k=96 B=2G in='SRR33420661_1.fastq SRR33420661_2.fastq'
+
+# We will make a new file called abyss out and move the assembly into that file. 
+
+	mkdir abyssout
+mv assembly* abyssout/
+
+#a We will then use quast to create a summary table from the spades scaffold fasta file.
+
+	quast.py spadesout/scaffolds.fasta -o quastspades
+
+#We will then use quast to create a summary table from the abyss scaffold fa file. 
+
+	quast.py abyssout/assembly-scaffolds.fa -o quastabyss
+
+# This code helps annotate the genome by getting information about the genes, rRNA sequence, and helps predict CDSs. 
+
+	dfast --genome spadesout/scaffolds.fasta --out dfast_output
+
+# Barrnap will help us extract the 16S rRNA sequence
+
+	barrnap --kingdom bac spadesout/scaffolds.fasta > rRNAsequences.gff
+
+# We will use bedtools to change the formatting from .gff file to .fasta file so we can use it on BLAST. 
+
+	bedtools getfasta -fi spadesout/scaffolds.fasta -bed rRNAsequences.gff -fo rRNAsequences.fasta
+
+# We now combine the two rRNA sequences and move them into a new folder called rRNA info.
+
+	mkdir rRNAinfo
+mv rRNAs* rRNAinfo/
+
+# This codes helps create a .txt folder for our neighbors species. 
+
+	pico neighbors.txt
+
+# We can put the fasta file of the neighboring species into that .txt file
+
+	neighbors/shigellaflexneri.fasta
+neighbors/shigellasonnei.fasta
+
+# fastANI will determine how closely relate the two neighboring species are to our reference genome.
+
+	fastANI -q spadesout/scaffolds.fasta --rl neighbors.txt -o Escherichianeighbors.txt
+
+
+
+#I then put my rRNA sequence into BLAST to see what bacteria I was dealing with and what neighboring species I had. 
+
+#I then used my spades scaffold fasta file (as it produced a better quality of assembly) for Prokka (DOWNLOADED .tsv, .tbl, .gff, gbk, .faa),PathogenFinder2, and CARD (clicked on RGI tools then inputted my scaffold fasta file). 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
